@@ -1,0 +1,17 @@
+.vs/
+
+# Build results
+bin/
+obj/
+
+# NuGet packages
+packages/
+
+# Visual Studio cache
+*.cache
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
