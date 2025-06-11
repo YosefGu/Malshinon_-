@@ -12,16 +12,26 @@ namespace Malshinon_.utils
     internal class DBUtils
     {
         //המרת מחורזת לפקודת SQL
-        private static MySqlCommand Command(string sql)
+        private static MySqlCommand Command(string sql, MySqlConnection conn)
         {
-            return new MySqlCommand { CommandText = sql };
+            return new MySqlCommand 
+            { 
+                CommandText = sql,
+                Connection = conn
+            };
         }
 
-        //שליחת הבקשה לשרת
-        private static MySqlDataReader Send(MySqlConnection conn, MySqlCommand cmd)
+        //שליחת בקשת לשרת SELECT
+        private static MySqlDataReader SendReader(MySqlCommand cmd)
         {
-            cmd.Connection = conn;
             return cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
+        }
+
+
+        //שליחת בקשת לשרת INSERT, UPDATE, DELETE
+        private static int SendNonQuery(MySqlCommand cmd)
+        {
+            return cmd.ExecuteNonQuery();
         }
 
         //המרת התשובה מהשרת למילון קריא
@@ -45,10 +55,30 @@ namespace Malshinon_.utils
         //ביצוע הקריאה לשרת והחזרת הנתונים תוך שימוש במתודות לעיל
         public static List<Dictionary<string, object>> Execute(string sql)
         {
+
             var conn = DBConnection.GetInstance().GetConnection();
-            var cmd = Command(sql);
-            var rdr = Send(conn, cmd);
-            return Parse(rdr);
+            var cmd = Command(sql, conn);
+
+            string lowered = sql.Trim().ToLower();
+
+            if (lowered.StartsWith("select"))
+            {
+                var red = SendReader(cmd);
+                return Parse(red);
+            }
+            else
+            {
+                int affectedRows = SendNonQuery(cmd);
+
+                return new List<Dictionary<string, object>>
+                {
+                    new Dictionary<string, object>
+                    {
+                        { "status", "ok" },
+                        {"rows_affected", affectedRows}
+                    }
+                };
+            }
         }
 
         //הדפסת השורות
