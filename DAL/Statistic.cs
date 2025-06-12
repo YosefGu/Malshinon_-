@@ -31,7 +31,7 @@ namespace Malshinon_.DAL
                 UPDATE statistics 
                 set 
                 submitted_reports = submitted_reports + 1, 
-                count_message_char = count_message_char + '{message_char}'  
+                count_message_char = count_message_char + {message_char}  
                 WHERE secret_code = {secret_code};";
         }
 
