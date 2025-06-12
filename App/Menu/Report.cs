@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Malshinon_.Controllers;
 
 namespace Malshinon_.App.Menu
 {
@@ -12,26 +13,43 @@ namespace Malshinon_.App.Menu
         {
             bool exit = false;
             Console.WriteLine("In order for us to begin...");
+
             while (!exit) 
             {
-                string ReporterNameOrCode = GetNameOrCode();
-                if (IsValidNameOrCode(ReporterNameOrCode))
+                try 
                 {
-                    string TargetNameOrCode = GetNameOrCode();
-                    if (IsValidNameOrCode(TargetNameOrCode))
-                    {
-                        string message = GetMessage();
-                        if (IsValidMessage(message))
-                        {
-                            Console.WriteLine("Your message has been received successfully."); 
-                        }
+                    string error; 
+                    string reporterNameOrCode = GetNameOrCode();
+                    if (!IsValidNameOrCode(reporterNameOrCode, out error))
+                        throw new Exception(error);
+                    
+                    Console.WriteLine("now for the target");
+                    string targetNameOrCode = GetNameOrCode();
+                    if (!IsValidNameOrCode(targetNameOrCode, out error))
+                        throw new Exception(error);
 
+                    string message = GetMessage();
+                    if (!IsValidMessage(message, out error))
+                        throw new Exception(error);
+
+                    bool response = ReportController.AddReport(reporterNameOrCode, targetNameOrCode, message);
+                    if (response)
+                    {
+                        Console.WriteLine("Your message has been received successfully.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("There was an issue submitting your report.");
                     }
 
+                } catch (Exception e)
+                {
+                    Console.WriteLine($"Error: {e.Message}");
                 }
+                
                 exit = AskForExit();   
             }
-            return exit;
+            return false;
         }
 
         private static string GetNameOrCode()
@@ -40,8 +58,9 @@ namespace Malshinon_.App.Menu
             return Console.ReadLine();
         }
 
-        private static bool IsValidNameOrCode(string nameOrCode)
+        private static bool IsValidNameOrCode(string nameOrCode, out string errorMessage)
         {
+            errorMessage = "";
             int code;
             if (int.TryParse(nameOrCode, out code))
             {
@@ -49,16 +68,13 @@ namespace Malshinon_.App.Menu
                     return true;
                 else
                 {
-                    Console.WriteLine(@"
-                    The code you entered is incorrect,
-                    it should be between 10,000 -100,000.");
+                    errorMessage = "The code name you entered is not recognized in system.";
                     return false;
-
                 }                    
             }
             if (nameOrCode.Length > 50)
             {
-                Console.WriteLine("The name you entered is too long.");
+                errorMessage = "The name you entered is too long.";
                 return false;
             }
             return true;
@@ -70,17 +86,19 @@ namespace Malshinon_.App.Menu
             return Console.ReadLine();
         }
 
-        private static bool IsValidMessage(string message)
-        { 
+        private static bool IsValidMessage(string message, out string errorMessage)
+        {
+            errorMessage = "";
             if (message.Length > 500)
             {
-                Console.WriteLine(@"
-                    Please shorten your message. 
-                    Maximum allowed is 500 characters.");
+                errorMessage = "Please shorten your message. \nMaximum allowed is 500 characters.";
                 return false;
             }
-            if (string.IsNullOrEmpty(message)) 
+            if (string.IsNullOrEmpty(message))
+            {
+                errorMessage = "The message is empty.";
                 return false;
+            }  
             return true;
         }
 
@@ -90,7 +108,7 @@ namespace Malshinon_.App.Menu
             bool exit = false;
             while (!goodAnswer)
             {
-                Console.WriteLine("Do you want to cancel sending a message? (Yes,No)");
+                Console.WriteLine("Do you want to continue sending a messages? (Yes,No)");
                 string response = Console.ReadLine();
 
                 if (response == "Yes")
@@ -102,14 +120,12 @@ namespace Malshinon_.App.Menu
                 {
                     goodAnswer = true;
                 }
-                Console.WriteLine("Incorrect answer.");
-
+                else
+                {
+                    Console.WriteLine("Incorrect answer.");
+                }
             }
             return exit;
-
-
-
         }
-
     }
 }
