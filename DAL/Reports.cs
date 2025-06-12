@@ -13,9 +13,9 @@ namespace Malshinon_.DAL
             return $"INSERT INTO reports (reporter, target, message) VALUES ({reporter}, {target}, '{message}');";
         }
 
-        public static string TargetLast15Minut()
+        public static string TargetLast15Minut(int targetCode)
         {
-            return $"SELECT target, COUNT(*) FROM reports WHERE time_report >= NOW() - INTERVAL 15 MINUT;";
+            return $"SELECT target, COUNT(*) as count FROM reports WHERE target = {targetCode} AND time_report >= NOW() - INTERVAL 15 MINUTE;";
         }
     }
 }
