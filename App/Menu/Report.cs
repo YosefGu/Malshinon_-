@@ -108,7 +108,7 @@ namespace Malshinon_.App.Menu
             bool exit = false;
             while (!goodAnswer)
             {
-                Console.WriteLine("Do you want to continue sending a messages? (Yes,No)");
+                Console.WriteLine("Do you want to stop sending messages?? (Yes,No)");
                 string response = Console.ReadLine();
 
                 if (response == "Yes")
