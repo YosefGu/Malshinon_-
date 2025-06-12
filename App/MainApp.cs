@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Malshinon_.App.Menu;
+using Malshinon_.Controllers;
 
 namespace Malshinon_.App
 {
@@ -22,16 +23,16 @@ namespace Malshinon_.App
                     switch (intSelect)
                     {
                         case 1:
-                            exit = Report.AddReport();
+                            Report.AddReport();
                             break;
                         case 2:
-                            exit = false;
+                            StatisticController.ShowPotentialCandidates();
                             break;
                         case 3:
-                            exit = false;
+                            StatisticController.ShowPotentialDangerous();
                             break;
                         case 4:
-                            exit = false;
+                            AlertController.ShowAllAlerts();
                             break;
                         case 5:
                             exit = true;
